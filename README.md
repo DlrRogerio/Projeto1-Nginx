@@ -15,38 +15,15 @@ Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) ded
  
 1. No console AWS, acesse o serviço VPC e clique em **Criar VPC**.
 
-2. Em "**Geração automática de etiqueta de nome**", deixe marcado para gerar os nomes automaticamente.
+2. O nome da VPC pode ser o que desejar, contudo, as outras opções devem estar iguais as das imagens.
 
-3. Aqui vai ter 2 fotos mostrando configuração
+![Primeira Parte da Configuraçõa da VPC](img/vpc1.png)
 
-4. No campo de entrada, digite a etiqueta que deseja utilizar como prefixo para o nome dos recursos que serão criados.
+![Segunda Parte da Configuraçõa da VPC](img/vpc2.png)
 
-5. Configure os recursos: 
+3. Se quiser, pode adicionar tags descritivas à VPC. Isso ajuda a identificar facilmente os recursos associados ao projeto.
 
-    - CIDR da VPC: 10.0.0.0/24 (fornece 256 endereços IP, suficiente para o projeto)
-    - Número de zonas de disponibilidade (AZs): 1 
-    - Número de sub-redes públicas: 1 
-    - Número de sub-redes privadas: 0 
-    - Gateway NAT: Nenhuma
-    - VPC endpoints: Nenhuma 
-
-6. Opcionalmente, adicione tags descritivas à VPC. Isso ajuda a identificar facilmente os recursos associados ao projeto.
-
-## 2.2 Criação da VPC 
-
-1. Clique em "**Criar VPC**" e aguarde a criação dos recursos.
-
-2. O assistente criará automaticamente:
-
-    - Uma VPC com DNS hostnames habilitado
-    - Uma sub-rede pública na AZ selecionada
-    - Um gateway de internet anexado à VPC
-    - Uma tabela de rota configurada com rota para o gateway de internet
-    - Um grupo de segurança padrão
-
-#### Preview do VPC Workflow
-
-![VPC Workflow](../imgs/nginx-vpc-workflow.png)
+4. Clique em "**Criar VPC**" e aguarde a criação dos recursos.
 
 ## 3. Configuração e Criação da Instância EC2
 
@@ -91,6 +68,8 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS e ire
     - No **tipo de instância**, selecione a **t2.micro**. Para o caso de utilização do projeto, os recursos da t2.micro serão suficientes. Além disto, ela está inclusa no nível gratuito da AWS.
 
     - Crie um par de chaves ou selecione um par de chaves já existente. Elas serão necessárias para acessar a instância via SSH.
+  
+      ![Par de Chaves](img/chaves.png)
 
 3. Configurações de rede da instância:
 
@@ -101,6 +80,8 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS e ire
     - Habilite a **atribuição de IP público automaticamente**.
 
     - Em "**Grupos de segurança comuns**", selecione o grupo de segurança criado com a VPC.
+
+      ![Configuração da Rede da Instância](img/rede_instancia.png)
 
 4. Mantenha as configurações de armazenamento padrões.
 
