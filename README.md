@@ -10,8 +10,6 @@ Este projeto tem como objetivo configurar um servidor web na AWS com monitoramen
 ## 2. Configuração do Ambiente Virtual
 
 Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) dedicada ao projeto.
-
-### 2.1 Configuração dos Recursos
  
 1. No console AWS, acesse o serviço VPC e clique em **Criar VPC**.
 
@@ -27,7 +25,7 @@ Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) ded
 
 ## 3. Configuração e Criação da Instância EC2
 
-Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS e iremos configurar um IP elástico para garantir um endereço consistente ao servidor nginx na instância. Além disso, iremos configurar regras específicas de entrada e saída no grupo de segurança da instância. A porta SSH (22) será limitada apenas ao seu IP para garantir acesso à instância de maneira segura e a porta HTTP (80) será aberta para qualquer IP (0.0.0.0/0) para que o servidor nginx seja acessível publicamente. Por fim, manteremos o tráfego de saída liberado para permitir que o servidor faça download de atualizações e pacotes necessários durante a instalação e operação do nginx.
+Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Além disso, iremos configurar regras específicas de entrada e saída no grupo de segurança da instância. A porta SSH (22) será limitada apenas ao seu IP para garantir acesso à instância de maneira segura e a porta HTTP (80) será aberta para qualquer IP (0.0.0.0/0) para que o servidor nginx seja acessível publicamente. Por fim, manteremos o tráfego de saída liberado para permitir que o servidor faça download de atualizações e pacotes necessários durante a instalação e operação do nginx.
 
 ### 3.1 Configuração do Grupo de Segurança 
 
@@ -134,7 +132,7 @@ ubuntu@ip-10-0-0-xx:~$
 
 ## 5. Instalação e Configuração do nginx
 
-1. Abra o terminal do Ubuntu e execute o seguinte comando para garantir a instalação do pacote correto e sua versão mais recente:
+1. Após se conectar no terminal do Ubuntu, execute o seguinte comando para verificar se não há atualizações a serem feitas:
 
 ```bash
 sudo apt update && sudo apt upgrade -y
