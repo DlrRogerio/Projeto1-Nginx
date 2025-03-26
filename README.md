@@ -53,9 +53,9 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
    
     - Origem: Qualquer IP (0.0.0.0/0).
    
-   Verifique as regras de saída (Outbound rules):
+    -Verifique as regras de saída (Outbound rules):
    
-   Mantenha a regra padrão, permitindo tráfego livre para qualquer destino (0.0.0.0/0).
+    -Mantenha a regra padrão, permitindo tráfego livre para qualquer destino (0.0.0.0/0).
 
 ### 2.2 Criação da Instância
 
@@ -125,7 +125,7 @@ ssh -i ~/caminho/da/chave.pem ubuntu@seu-ip-publico-da-ec2
 ubuntu@ip-10-0-0-xx:~$
 ```
 
-## 4. Instalação e Configuração do nginx
+## 4. Instalação e Configuração do Nginx
 
 1. Após se conectar no terminal do Ubuntu, execute o seguinte comando para verificar se não há atualizações a serem feitas:
 
@@ -133,13 +133,13 @@ ubuntu@ip-10-0-0-xx:~$
 sudo apt update && sudo apt upgrade -y
 ```
 
-2. Instale o nginx:
+2. Instale o Nginx:
 
 ```bash
 sudo apt install nginx -y
 ```
 
-3. Verifique o status do nginx:
+3. Verifique o status do Nginx:
 
 ```bash
 sudo systemctl status nginx
@@ -149,12 +149,12 @@ sudo systemctl status nginx
 
 ![Página Padrão do nginx](/img/nginx.png)
 
-## 5. Configurar Diretório do Site
+## 5. Configuração do Diretório do Site
 
 Neste projeto foi utilizado uma página de um site de compras de bicicletas. Os arquivos estão no repositório.
 Para implementar uma página customizada no Nginx, implemente os passos a seguir:
  
-1. Copie os arquivos HTML, CSS e imagens do seu computador local para a instância:  
+1. Copie a pasta contendo os arquivos HTML, CSS e imagens do seu computador local para a instância:  
    ```bash
    scp -i chave01.pem -r /home/rogerio/bikcraft ubuntu@IP_PUBLICO_DA_EC2:/home/ubuntu/
    ```
@@ -166,7 +166,7 @@ Para implementar uma página customizada no Nginx, implemente os passos a seguir
    ```bash
    sudo nano /etc/nginx/sites-available/default
    ```
-4. Altere a linha `root` para apontar para o diretório do site:  
+4. Altere a linha "root" para direcionar ao diretório do site:  
    ```nginx
    root /var/www/html/bikcraft;
    ```
@@ -175,6 +175,70 @@ Para implementar uma página customizada no Nginx, implemente os passos a seguir
    sudo systemctl restart nginx
    ```
    
-A partir daqui você já deve ver o seu site customizado no Nginx:
+Com isso, ao recarregar a página, você já deve ver o seu site customizado no Nginx:
 
-![image](https://github.com/user-attachments/assets/43e6b098-bdd1-46ae-86ce-e2f5fa18f653)
+![Página HTML](/img/bikcraft.png)
+
+## 6. Configuração do Discord
+
+Para esta etapa, você deve ter um servidor no Discord ou estar em um com permissão para criar e modificar chats.
+
+1. Escolha um chat ou crie um novo.
+
+2. Clique em Editar Canal.
+
+3. Vá em Integrações -> Webhooks.
+
+4. Crie um novo Webhook.
+
+![Imagem Webhook](/img/webhook.png)
+
+5. Nomeie como desejar e escolha o chat no qual o script irá mandar os alertas.
+   
+6. Copie a URL do Webhook, ela será adicionada no script.
+
+## 7. Criação e Configuração do Script
+
+1. Crie um arquivo Python para o script.
+   
+    ```bash
+   nano /usr/local/bin/monitoramento.py
+   ```
+2. Cole o código abaixo:
+   ```python
+   import requests
+   import time
+
+   def enviar_notificacao_discord(mensagem):
+       webhook_url = 'https://discordapp.com/api/webhooks/aqui_vai_sua_url_webhook'
+       payload = {
+           "content": mensagem
+       }
+   
+       try:
+           response = requests.post(webhook_url, json=payload)
+           if response.status_code == 204:
+               print("Notificação enviada para o Discord com sucesso!")
+           else:
+               print(f"Falha ao enviar notificação para o Discord. Status: {response.status_code}")
+       except requests.exceptions.RequestException as e:
+           print(f"Erro ao enviar notificação para o Discord: {e}")
+   
+   def verificar_site(url):
+       try:
+           resposta = requests.get(url)
+           if resposta.status_code == 200:
+               enviar_notificacao_discord(f'O site {url} está ONLINE.')
+           else:
+               enviar_notificacao_discord(f'O site {url} está OFFLINE. Status: {resposta.status_code}')
+       except requests.exceptions.RequestException as e:
+           print(f'O site está OFFLINE. Erro {e}')
+           enviar_notificacao_discord(f'O site {url} está OFFLINE. Erro: {e}')
+   
+   url = 'http://localhost/'
+
+   while True:
+       verificar_site(url)
+       time.sleep(60)
+   ```
+3. Substitua o link webhook pelo que você copiou no Discord e salve o arquivo.
