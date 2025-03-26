@@ -19,7 +19,7 @@ Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) ded
 
 ![Segunda Parte da Configuraçõa da VPC](img/vpc2.png)
 
-3. Se quiser, pode adicionar tags descritivas à VPC. Isso ajuda a identificar facilmente os recursos associados ao projeto.
+3. Se quiser, pode adicionar tags descritivas à VPC. Isso facilita a identificação dos recursos associados ao projeto.
 
 4. Clique em "**Criar VPC**" e aguarde a criação dos recursos.
 
@@ -33,7 +33,7 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
  2. No painel EC2, sob a categoria "Rede e Segurança", clique em "Grupos de segurança".
 
- 3. Encontre o grupo de segurança associado à sua VPC (você pode procurar pelo ID da VPC no painel de informações) e clique sobre ele para editar.
+ 3. Encontre o grupo de segurança associado à sua VPC (procure pelo ID da VPC no painel de informações) e clique sobre ele para editar.
 
  4. No grupo de segurança, clique em "Editar regras de entrada" (Inbound rules).
 
@@ -65,21 +65,21 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
     -Na página principal do EC2, clique em "Executar instância" para iniciar o processo de criação.
 
-    -Nas configurações gerais da instância, adicione tags descritivas que ajudem a identificar e gerenciar a instância no futuro.
+    -Nas configurações gerais da instância, adicione tags descritivas para melhorar a identificação e o gerenciamento da instância no futuro.
 
     -Escolha a AMI do Ubuntu Server 24.04 LTS.
 
     -Para o tipo de instância, selecione a t2.micro. Esse tipo de instância é suficiente para este projeto e está coberto pelo nível gratuito da AWS.
 
-    -Crie um novo par de chaves ou selecione um já existente. Essas chaves serão necessárias para acessar a instância via SSH, então deve guardá-las com segurança.
+    -Crie um novo par de chaves ou selecione um já existente. Essas chaves serão necessárias para acessar a instância via SSH, por isso devem ser guardadas com segurança.
    
       ![Par de Chaves](img/chaves.png)
 
-4. Configurações de rede da instância:
+3. Configurações de rede da instância:
 
     - Em "**VPC**", selecione a VPC criada anteriormente para o projeto.
 
-    - Em "**sub-rede**", selecione a sub-rede criada com a VPC.
+    - Em "**sub-rede**", selecione a sub-rede pública criada com a VPC.
 
     - Habilite a **atribuição de IP público automaticamente**.
 
@@ -87,9 +87,9 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
       ![Configuração da Rede da Instância](img/rede_instancia.png)
 
-5. Mantenha as configurações de armazenamento padrões.
+4. Mantenha as configurações de armazenamento padrões.
 
-2. Revise as configurações. Caso esteja tudo correto, clique em "**Executar instância**".
+5. Revise as configurações. Caso esteja tudo correto, clique em "**Executar instância**".
 
 ### 2.3 Alocação do IP Elástico
 
@@ -109,11 +109,11 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
 ## 3. Conectando à Instância
 
-Iremos usar essa chave para estabelecer uma conexão segura via SSH com a instância.
+Iremos usar a chave criada para estabelecer uma conexão segura via SSH com a instância.
 
 ### Conexão via SSH
 
-1. Abra o terminal no seu computador e use o comando `ssh` para se conectar à sua instancia. Você precisará da localização da chave privada (arquivo .pem), do nome de usuário ( ubuntu é o nome padrão do usuário) e seu IP público, como no exemplo abaixo:
+1. Abra o terminal no seu computador e use o comando `ssh` para se conectar à sua instancia. Você precisará da localização da chave privada (arquivo .pem), do nome de usuário ("ubuntu" é o nome padrão do usuário) e seu IP público, como no exemplo abaixo:
 
 ```bash
 ssh -i ~/caminho/da/chave.pem ubuntu@seu-ip-publico-da-ec2
@@ -154,36 +154,23 @@ sudo systemctl status nginx
 Neste projeto foi utilizado uma página de um site de compras de bicicletas. Os arquivos estão no repositório.
 Para implementar uma página customizada no Nginx, implemente os passos a seguir:
  
-1. Crie o diretório para o site:  
-   ```bash
-   sudo mkdir -p /var/www/html/bikcraft
-   sudo chmod 775 /var/www/html/
-   ```
-2. Copie os arquivos HTML, CSS e imagens do seu computador local para a instância:  
+1. Copie os arquivos HTML, CSS e imagens do seu computador local para a instância:  
    ```bash
    scp -i chave01.pem -r /home/rogerio/bikcraft ubuntu@IP_PUBLICO_DA_EC2:/home/ubuntu/
    ```
-3. Mova os arquivos para o diretório do Nginx:  
+2. Mova os arquivos para o diretório do Nginx:  
    ```bash
    sudo mv /home/ubuntu/bikcraft /var/www/html/
    ```
-4. Ajuste as permissões:  
-   ```bash
-   sudo chown -R www-data:www-data /var/www/html/restaurante
-   sudo chmod -R 755 /var/www/html/restaurante
-   ```
-   
-### **2.4 Configurar o Nginx**
-1. Edite o arquivo de configuração:  
+3. Edite o arquivo de configuração:  
    ```bash
    sudo nano /etc/nginx/sites-available/default
    ```
-2. Altere a linha `root` para apontar para o diretório do site:  
+4. Altere a linha `root` para apontar para o diretório do site:  
    ```nginx
-   root /var/www/html/restaurante;
-   index index.html;
+   root /var/www/html/bikcraft;
    ```
-3. Reinicie o Nginx:  
+5. Reinicie o Nginx:  
    ```bash
    sudo systemctl restart nginx
    ```
