@@ -7,7 +7,7 @@ Este projeto tem como objetivo configurar um servidor web na AWS com monitoramen
 ## Sumário
 
 
-## 2. Configuração do Ambiente Virtual
+## 1. Configuração do Ambiente Virtual
 
 Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) dedicada ao projeto.
  
@@ -23,53 +23,59 @@ Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) ded
 
 4. Clique em "**Criar VPC**" e aguarde a criação dos recursos.
 
-## 3. Configuração e Criação da Instância EC2
+## 2. Configuração e Criação da Instância EC2
 
-Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Além disso, iremos configurar regras específicas de entrada e saída no grupo de segurança da instância. A porta SSH (22) será limitada apenas ao seu IP para garantir acesso à instância de maneira segura e a porta HTTP (80) será aberta para qualquer IP (0.0.0.0/0) para que o servidor nginx seja acessível publicamente. Por fim, manteremos o tráfego de saída liberado para permitir que o servidor faça download de atualizações e pacotes necessários durante a instalação e operação do nginx.
+Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Além disso, iremos configurar regras específicas de entrada e saída no grupo de segurança da instância. 
 
-### 3.1 Configuração do Grupo de Segurança 
+### 2.1 Configuração do Grupo de Segurança 
 
-1. Na aba de serviços, clique em "**EC2**".
+ 1. Na interface do AWS, vá até "EC2" na seção de serviços.
 
-2. No painel EC2, na seção "**Rede e Segurança**", clique em "**Grupos de segurança**".
+ 2. No painel EC2, sob a categoria "Rede e Segurança", clique em "Grupos de segurança".
 
-3. Localize o grupo de segurança criado pela sua VPC (procure pelo grupo de segurança associado ao ID da sua VPC no painel de informações), e clique nele para editar.
+ 3. Encontre o grupo de segurança associado à sua VPC (você pode procurar pelo ID da VPC no painel de informações) e clique sobre ele para editar.
 
-4. Clique em editar as regras de entrada (Inbound rules).
+ 4. No grupo de segurança, clique em "Editar regras de entrada" (Inbound rules).
 
-5. Adicione uma regra para o **SSH**:
-
+    -Adicione a seguinte regra para o SSH:
+  
     - Tipo: SSH
+   
     - Porta: 22
-    - Tipo de origem: seu endereço de IP (use "**Meu IP**" para adicionar automaticamente)
-
-6. Adicione uma regra para o **HTTP**:
-
+   
+    - Origem: Defina como seu endereço IP (use a opção "Meu IP" para preenchê-lo automaticamente).
+   
+    -Adicione também a regra para o HTTP:
+   
     - Tipo: HTTP
+   
     - Porta: 80
-    - Tipo de origem: qualquer local-ipv4 (0.0.0.0/0)
+   
+    - Origem: Qualquer IP (0.0.0.0/0).
+   
+   Verifique as regras de saída (Outbound rules):
+   
+   Mantenha a regra padrão, permitindo tráfego livre para qualquer destino (0.0.0.0/0).
 
-7. Verifique as regras de saída (Outbound rules):
-
-    - Mantenha a regra padrão que permite todo tráfego (0.0.0.0/0)
-
-### 3.2 Criação da Instância
+### 2.2 Criação da Instância
 
 1. Na página principal do EC2, clique em "**Executar instância**".
 
 2. Configurações gerais da instância:
 
-    - Crie tags descritivas associadas ao projeto para facilitar o gerenciamento da instância no futuro.
+    -Na página principal do EC2, clique em "Executar instância" para iniciar o processo de criação.
 
-    - Selecione a AMI do **Ubuntu Server 24.04 LTS**.
+    -Nas configurações gerais da instância, adicione tags descritivas que ajudem a identificar e gerenciar a instância no futuro.
 
-    - No **tipo de instância**, selecione a **t2.micro**. Para o caso de utilização do projeto, os recursos da t2.micro serão suficientes. Além disto, ela está inclusa no nível gratuito da AWS.
+    -Escolha a AMI do Ubuntu Server 24.04 LTS.
 
-    - Crie um par de chaves ou selecione um par de chaves já existente. Elas serão necessárias para acessar a instância via SSH.
-  
+    -Para o tipo de instância, selecione a t2.micro. Esse tipo de instância é suficiente para este projeto e está coberto pelo nível gratuito da AWS.
+
+    -Crie um novo par de chaves ou selecione um já existente. Essas chaves serão necessárias para acessar a instância via SSH, então deve guardá-las com segurança.
+   
       ![Par de Chaves](img/chaves.png)
 
-3. Configurações de rede da instância:
+4. Configurações de rede da instância:
 
     - Em "**VPC**", selecione a VPC criada anteriormente para o projeto.
 
@@ -81,11 +87,11 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
       ![Configuração da Rede da Instância](img/rede_instancia.png)
 
-4. Mantenha as configurações de armazenamento padrões.
+5. Mantenha as configurações de armazenamento padrões.
 
 2. Revise as configurações. Caso esteja tudo correto, clique em "**Executar instância**".
 
-### 3.3 Alocação do IP Elástico
+### 2.3 Alocação do IP Elástico
 
 1. No painel EC2, na seção "**Rede e Segurança**", navegue até "**IPs elásticos**".
 
@@ -101,27 +107,16 @@ Criaremos uma instância EC2 utilizando uma AMI do Ubuntu Server 24.04 LTS. Alé
 
 7. Clique em "**Associar**".
 
-## 4. Conectando à Instância
+## 3. Conectando à Instância
 
-Primeiro, iremos ajustar as permissões da chave privada. Em seguida, iremos usar essa chave para estabelecer uma conexão segura via SSH com a instância.
+Iremos usar essa chave para estabelecer uma conexão segura via SSH com a instância.
 
-### 4.1 Configuração da Chave SSH 
+### Conexão via SSH
 
-1. Use o seguinte comando para definir as permissões do seu arquivo de chave privada para que somente você possa lê-lo:
-
-   ```bash
-   chmod 400 ~/caminho/da/chave.pem
-   ```
-
-> [!IMPORTANT]
-> Se você não definir essas permissões, não será possível se conectar à sua instância usando esse par de chaves, pois, por questões de segurança, o cliente SSH rejeitará a chave.
-
-### 4.2 Conexão via SSH
-
-1. Abra o terminal no seu computador e use o comando `ssh` para se conectar à sua instancia. Você precisará da localização da chave privada (arquivo .pem), do nome de usuário e seu DNS público, como no exemplo abaixo:
+1. Abra o terminal no seu computador e use o comando `ssh` para se conectar à sua instancia. Você precisará da localização da chave privada (arquivo .pem), do nome de usuário ( ubuntu é o nome padrão do usuário) e seu IP público, como no exemplo abaixo:
 
 ```bash
-ssh -i ~/caminho/da/chave.pem ubuntu@seu-dns-publico
+ssh -i ~/caminho/da/chave.pem ubuntu@seu-ip-publico-da-ec2
 ```
 
 2. Na primeira vez que se conectar, você verá um aviso de fingerprint. Aceite digitando "yes" para confirmar que está se conectando ao servidor correto e salvá-lo para futuras conexões seguras. Após a conexão, algumas informações sobre a distribuição Ubuntu serão exibidas, e o prompt do shell deve ser algo como:
@@ -130,7 +125,7 @@ ssh -i ~/caminho/da/chave.pem ubuntu@seu-dns-publico
 ubuntu@ip-10-0-0-xx:~$
 ```
 
-## 5. Instalação e Configuração do nginx
+## 4. Instalação e Configuração do nginx
 
 1. Após se conectar no terminal do Ubuntu, execute o seguinte comando para verificar se não há atualizações a serem feitas:
 
@@ -148,3 +143,51 @@ sudo apt install nginx -y
 
 ```bash
 sudo systemctl status nginx
+```
+
+4. Para verificar se o servidor está funcionando, abra o navegador e digite o IP público. Se tudo estiver certo, o site deve mostrar a página padrão do nginx:
+
+![Página Padrão do nginx](/img/nginx.png)
+
+## 5. Configurar Diretório do Site
+
+Neste projeto foi utilizado uma página de um site de compras de bicicletas. Os arquivos estão no repositório.
+Para implementar uma página customizada no Nginx, implemente os passos a seguir:
+ 
+1. Crie o diretório para o site:  
+   ```bash
+   sudo mkdir -p /var/www/html/bikcraft
+   sudo chmod 775 /var/www/html/
+   ```
+2. Copie os arquivos HTML, CSS e imagens do seu computador local para a instância:  
+   ```bash
+   scp -i chave01.pem -r /home/rogerio/bikcraft ubuntu@IP_PUBLICO_DA_EC2:/home/ubuntu/
+   ```
+3. Mova os arquivos para o diretório do Nginx:  
+   ```bash
+   sudo mv /home/ubuntu/bikcraft /var/www/html/
+   ```
+4. Ajuste as permissões:  
+   ```bash
+   sudo chown -R www-data:www-data /var/www/html/restaurante
+   sudo chmod -R 755 /var/www/html/restaurante
+   ```
+   
+### **2.4 Configurar o Nginx**
+1. Edite o arquivo de configuração:  
+   ```bash
+   sudo nano /etc/nginx/sites-available/default
+   ```
+2. Altere a linha `root` para apontar para o diretório do site:  
+   ```nginx
+   root /var/www/html/restaurante;
+   index index.html;
+   ```
+3. Reinicie o Nginx:  
+   ```bash
+   sudo systemctl restart nginx
+   ```
+   
+A partir daqui você já deve ver o seu site customizado no Nginx:
+
+![image](https://github.com/user-attachments/assets/43e6b098-bdd1-46ae-86ce-e2f5fa18f653)
