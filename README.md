@@ -1,4 +1,4 @@
-# Projeto1-Nginx
+# Projeto Monitorameno Nginx
 
 ## Sobre o Projeto
 
@@ -6,7 +6,16 @@ Este projeto tem como objetivo configurar um servidor web na AWS com monitoramen
 
 ## Sumário
 
-
+1. [Configuração do Ambiente Virtual](#1-configuração-do-ambiente-virtual)
+2. [Configuração e Criação da Instância EC2](#2-configuração-e-criação-da-instância-ec2)
+   - [Configuração do Grupo de Segurança](#21-configuração-do-grupo-de-segurança)
+   - [Criação da Instância](#22-criação-da-instância)
+   - [Alocação do IP Elástico](#23-alocação-do-ip-elástico)
+3. [Conectando à Instância](#3-conectando-à-instância)
+4. [Instalação e Configuração do Nginx](#4-instalação-e-configuração-do-nginx)
+5. [Configuração do Diretório do Site](#5-configuração-do-diretório-do-site)
+6. [Configuração do Discord](#6-configuração-do-discord)
+7. [Criação e Configuração do Script](#7-criação-e-configuração-do-script)
 ## 1. Configuração do Ambiente Virtual
 
 Para começar, precisamos criar e configurar uma VPC (Virtual Private Cloud) dedicada ao projeto.
@@ -242,3 +251,10 @@ Para esta etapa, você deve ter um servidor no Discord ou estar em um com permis
        time.sleep(60)
    ```
 3. Substitua o link webhook pelo que você copiou no Discord e salve o arquivo.
+
+4. Para rodar o script, use o seguinte comando:
+  ```bash
+  python3 script.py
+  ```
+
+5. Para parar o script, pressione Ctrl + C.
