@@ -252,9 +252,14 @@ Para esta etapa, você deve ter um servidor no Discord ou estar em um com permis
    ```
 3. Substitua o link webhook pelo que você copiou no Discord e salve o arquivo.
 
-4. Para rodar o script, use o seguinte comando:
+4. Para rodar o script, é necessário editar o cron.
   ```bash
-  python3 script.py
+  crontab -e * * * * * /usr/bin/python3 /home/rogerio/script.py
   ```
 
-5. Para parar o script, pressione `Ctrl + C`.
+5. Digite 1 para editar com o nano, e adicione na última linha, o seguinte comando.
+  ```bash
+  * * * * * /usr/bin/python3 /home/rogerio/script.py
+  ```
+
+6. Salve o arquivo e ele começará a executar automaticamente.
