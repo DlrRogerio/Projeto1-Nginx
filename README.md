@@ -257,4 +257,4 @@ Para esta etapa, você deve ter um servidor no Discord ou estar em um com permis
   python3 script.py
   ```
 
-5. Para parar o script, pressione Ctrl + C.
+5. Para parar o script, pressione `Ctrl + C`.
