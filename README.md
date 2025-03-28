@@ -254,12 +254,12 @@ Para esta etapa, você deve ter um servidor no Discord ou estar em um com permis
 
 4. Para rodar o script, é necessário editar o cron.
   ```bash
-  crontab -e * * * * * /usr/bin/python3 /home/rogerio/script.py
+  crontab -e
   ```
 
 5. Digite 1 para editar com o nano, e adicione na última linha, o seguinte comando.
   ```bash
-  * * * * * /usr/bin/python3 /home/rogerio/script.py
+  * * * * * /usr/bin/python3 /local/arquivo/monitoramento.py
   ```
 
 6. Salve o arquivo e ele começará a executar automaticamente.
